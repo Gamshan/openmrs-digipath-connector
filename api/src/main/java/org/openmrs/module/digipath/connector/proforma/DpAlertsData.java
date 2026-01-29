@@ -1,24 +1,30 @@
 package org.openmrs.module.digipath.connector.proforma;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import net.openclinical.beans.DataDefinition;
+import net.openclinical.beans.DataDefinitionClass;
 import net.openclinical.beans.Meta;
 
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DpAlertsData {
 	
-	private Meta meta;
+	private String name;
 	
 	private String caption;
 	
+	private String description;
+	
 	private List<DataDefinition> dataDefinitions;
 	
-	public Meta getMeta() {
-		return meta;
+	public String getName() {
+		return name;
 	}
 	
-	public void setMeta(Meta meta) {
-		this.meta = meta;
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	public String getCaption() {
@@ -35,5 +41,13 @@ public class DpAlertsData {
 	
 	public void setDataDefinitions(List<DataDefinition> dataDefinitions) {
 		this.dataDefinitions = dataDefinitions;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

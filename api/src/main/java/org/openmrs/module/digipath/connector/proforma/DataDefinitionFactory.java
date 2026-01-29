@@ -3,6 +3,7 @@ package org.openmrs.module.digipath.connector.proforma;
 public class DataDefinitionFactory {
 	
 	public static DataDefinitionEvaluator get(String resourceType) {
+		System.out.println("DataDefinitionEvaluator resourceType" + resourceType);
 		switch (resourceType) {
 			case "Observation":
 				return new ObservationEvaluator();

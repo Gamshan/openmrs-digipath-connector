@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.digipath.connector.api.DigipathRestService;
 import org.openmrs.module.digipath.connector.api.dao.DigipathRestDao;
+import org.openmrs.module.digipath.connector.proforma.DpAlertsData;
 
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,8 @@ public class DigipathRestServiceImpl extends BaseOpenmrsService implements Digip
 	}
 	
 	@Override
-	public Map<String, Object> performProforma(List<DataDefinition> dataDefinitionList, String patientUuid) {
-		return dao.performProforma(dataDefinitionList, patientUuid);
+	public List<Map<String, Object>> performProforma(DpAlertsData dpAlertsData, String json, String patientUuid) {
+		return dao.performProforma(dpAlertsData, json, patientUuid);
 	}
 	
 }

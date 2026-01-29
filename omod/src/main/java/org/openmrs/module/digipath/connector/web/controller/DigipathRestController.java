@@ -1,6 +1,9 @@
 package org.openmrs.module.digipath.connector.web.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.openclinical.beans.DataDefinition;
+
 import org.openmrs.api.context.Context;
 import org.openmrs.module.digipath.connector.api.DigipathRestService;
 import org.openmrs.module.digipath.connector.proforma.DpAlerts;
@@ -10,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.*;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceController;
 import org.springframework.web.client.RestTemplate;
@@ -35,30 +39,46 @@ public class DigipathRestController extends MainResourceController {
 		//		return "HELLO WORLD";
 	}
 	
-	@RequestMapping(value = "/perfoma", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/get-recommendations", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public Map<String, Object> getDigipathPerforma(@RequestParam String patientUuid, @RequestBody DpAlerts dpAlerts) {
+	public List<Map<String, Object>> getDigipathRecommendations(@RequestParam String patientUuid) {
 		
-		//		DpAlerts dpAlerts = fetchDataFromExternalApi();
-
+		String json = fetchDataFromExternalApi();
+		ObjectMapper objectMapper = new ObjectMapper();
 		
-		if (dpAlerts == null || dpAlerts.getData() == null || dpAlerts.getData().getDataDefinitions() == null)
-			throw new IllegalArgumentException();
-		
-		DigipathRestService digipathRestService = Context.getService(DigipathRestService.class);
-		return digipathRestService.performProforma(dpAlerts.getData().getDataDefinitions(), patientUuid);
+		try {
+			DpAlerts dpAlerts = objectMapper.readValue(json, DpAlerts.class);
+			JsonNode root = objectMapper.readTree(json);
+			JsonNode dataNode = root.get("data");
+			String flattenedJson = objectMapper.writeValueAsString(dataNode);
+			
+			if (dpAlerts == null || dpAlerts.getData() == null)
+				throw new IllegalArgumentException();
+			
+			DigipathRestService digipathRestService = Context.getService(DigipathRestService.class);
+			return digipathRestService.performProforma(dpAlerts.getData(), flattenedJson, patientUuid);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		
 	}
-
 	
-	public DpAlerts fetchDataFromExternalApi() {
+	@RequestMapping(value = "/fetch-data", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	public String fetchDataFromExternalApi() {
 		RestTemplate restTemplate = new RestTemplate();
 		String url = "https://labs.openclinical.net/api/v1/matt/dp_alerts_next";
 		
-		// GET request to fetch data as a String or a custom DTO class
 		ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+		String json = response.getBody();
 		
-		return restTemplate.getForObject(url, DpAlerts.class);
+		System.out.println("json fetched " + json);
+		
+		//		return restTemplate.getForObject(url, DpAlerts.class);
+		
+		return json;
 	}
 }

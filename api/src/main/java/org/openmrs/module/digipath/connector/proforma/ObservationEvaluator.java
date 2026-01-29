@@ -2,12 +2,21 @@ package org.openmrs.module.digipath.connector.proforma;
 
 import net.openclinical.beans.Code;
 import net.openclinical.beans.DataDefinition;
+import net.openclinical.beans.Fhir;
+import net.openclinical.proforma.Protocol;
+import net.openclinical.proforma.enactment.EnactmentOptions;
+import net.openclinical.proforma.tasks.Task;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.context.Context;
 
+import java.io.IOException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 public class ObservationEvaluator implements DataDefinitionEvaluator {
@@ -15,26 +24,34 @@ public class ObservationEvaluator implements DataDefinitionEvaluator {
 	ObsService obsService = Context.getService(ObsService.class);
 	
 	@Override
-	public Object evaluate(DataDefinition dataDefinition, Patient patient) {
+	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value) {
 		
 		System.out.println(" ObservationEvaluator " + 111111);
-		Object value;
-		switch (dataDefinition.getMeta().getFhir().getElementId()) {
+		
+		List<EnactmentOptions.TimestampedValue> list;
+		switch (fhir.getElement()) {
 			case "code":
-				value = extractAllDataForCode(dataDefinition.getMeta().getFhir().getCode(), patient);
+				list = extractDataByPatientAndCode(fhir.getCode(), patient, true);
 				break;
 			default:
 				throw new IllegalArgumentException();
 		}
 		
-		return value;
+		return list;
 	}
 	
-	private Float extractAllDataForCode(Code code, Patient patient) {
-		System.out.println("Yesss ");
+	private List<EnactmentOptions.TimestampedValue> extractDataByPatientAndCode(Code code, Patient patient, boolean isMultiValue) {
 		Concept concept = DigipathUtils.getConceptByCode(code);
-		System.out.println("concept " + concept.getUuid());
-		Optional<Obs> optionalObs = obsService.getObservationsByPersonAndConcept(patient, concept).stream().findFirst();
-        return optionalObs.map(obs -> obs.getValueNumeric().floatValue()).orElseGet(() -> (float) 0);
+		List<Obs> obsList = obsService.getObservationsByPersonAndConcept(patient, concept);
+		List<EnactmentOptions.TimestampedValue> timestampedValueList = new ArrayList<>();
+
+		obsList.forEach(obs -> {
+			if(obs.getValueNumeric() != null && (isMultiValue || timestampedValueList.isEmpty()))
+//				timestampedValueList.add(new EnactmentOptions.TimestampedValue(obs.getDateCreated().toInstant(), obs.getValueNumeric()));
+				timestampedValueList.add(new EnactmentOptions.TimestampedValue(Instant.parse("2022-12-04T10:00:00Z"), obs.getValueNumeric()));
+		});
+		if(!timestampedValueList.isEmpty())
+			return timestampedValueList;
+        return null;
     }
 }
