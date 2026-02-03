@@ -47,11 +47,9 @@ public class ObservationEvaluator implements DataDefinitionEvaluator {
 
 		obsList.forEach(obs -> {
 			if(obs.getValueNumeric() != null && (isMultiValue || timestampedValueList.isEmpty()))
-//				timestampedValueList.add(new EnactmentOptions.TimestampedValue(obs.getDateCreated().toInstant(), obs.getValueNumeric()));
-				timestampedValueList.add(new EnactmentOptions.TimestampedValue(Instant.parse("2022-12-04T10:00:00Z"), obs.getValueNumeric()));
+				timestampedValueList.add(new EnactmentOptions.TimestampedValue(obs.getDateCreated().toInstant(), obs.getValueNumeric()));
 		});
-		if(!timestampedValueList.isEmpty())
-			return timestampedValueList;
-        return null;
+		return timestampedValueList;
+
     }
 }

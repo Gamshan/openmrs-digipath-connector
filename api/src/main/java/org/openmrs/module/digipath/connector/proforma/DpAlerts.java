@@ -1,5 +1,8 @@
 package org.openmrs.module.digipath.connector.proforma;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DpAlerts {
 	
 	DpAlertsData data;

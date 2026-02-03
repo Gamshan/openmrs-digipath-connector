@@ -17,10 +17,12 @@ import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.digipath.connector.proforma.DataDefinitionEvaluator;
 import org.openmrs.module.digipath.connector.proforma.DataDefinitionFactory;
+import org.openmrs.module.digipath.connector.proforma.DpAlerts;
 import org.openmrs.module.digipath.connector.proforma.DpAlertsData;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class HibernateDigipathRestDao implements DigipathRestDao {
 	
@@ -61,7 +63,8 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 
 				if(dataDefinition.getMeta() != null && dataDefinition.getMeta().getFhir() != null) {
 					List<EnactmentOptions.TimestampedValue> timestampedValueList = getDataByCodeAndPatient(dataDefinition.getMeta().getFhir(), patient, null);
-					result.put(dataDefinition.getName(), timestampedValueList);
+					if(timestampedValueList != null)
+						result.put(dataDefinition.getName(), timestampedValueList);
 				}else if(dataDefinition.getRange() != null){
 					List<EnactmentOptions.TimestampedValue> valueList = new ArrayList<>();
 					dataDefinition.getRange().forEach(range -> {
@@ -81,14 +84,6 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 	private List<Map<String,Object>> executeRuleEngine(String json, DpAlertsData dpAlertsData, Map<String, List<EnactmentOptions.TimestampedValue>> listMap) {
 
 		try {
-			ObjectMapper mapper = new ObjectMapper();
-			String json2 = mapper.writeValueAsString(dpAlertsData);
-			System.out.println("JSON" + json2);
-		}catch (JsonProcessingException e){
-			throw new Error("Invalid Json format" + e);
-		}
-
-		try {
 
 			Map<String, Map<String, List<EnactmentOptions.TimestampedValue>>> enactmentData = new HashMap<>();
 			enactmentData.put(dpAlertsData.getName(), listMap);
@@ -104,11 +99,9 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 			Enactment enactment = new Enactment(protocol, enactmentOptions);
 			System.out.println("EXECUTE 555555" +  enactment.getStatus().isStarted() +  enactment.getStatus().isFinished() +  enactment.getStatus().getCompleteable() + enactment.getStatus().getCancellable());
 			System.out.println("EXECUTE 5555551 1" +  enactment.getData());
-			System.out.println("EXECUTE 5555551 2" +  enactment.evaluate("hba1c"));
 			List<Map<String,Object>> recommendations = getRecommendations(enactment);
-			System.out.println("EXECUTE 66666" + System.getProperty("org.graalvm.version"));
 			System.out.println(recommendations);
-			return recommendations;
+			return Optional.ofNullable(recommendations).orElse(new ArrayList<>());
 		}
 		catch (Protocol.ProtocolParseException e) {
 			throw new Error("ProtocolParseException " + e);
@@ -142,5 +135,13 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 			return timestampedValueList;
 		}
 		return null;
+	}
+	
+	public Map<String, Object> getFhirFormattedData(DpAlertsData dpAlertsData,String json, String patientUuid){
+        return getDataForDataDefinitions(dpAlertsData, patientUuid).entrySet().stream()
+				.collect(Collectors.toMap(
+						Map.Entry::getKey,
+						Map.Entry::getValue // Value is already a List, which is an Object
+				));
 	}
 }

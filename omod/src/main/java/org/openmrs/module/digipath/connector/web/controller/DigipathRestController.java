@@ -7,6 +7,7 @@ import net.openclinical.beans.DataDefinition;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.digipath.connector.api.DigipathRestService;
 import org.openmrs.module.digipath.connector.proforma.DpAlerts;
+import org.openmrs.module.digipath.connector.proforma.DpAlertsData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +66,32 @@ public class DigipathRestController extends MainResourceController {
 		
 	}
 	
+	@RequestMapping(value = "/get-fhir-data", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	public Map<String, Object> getFhirFormattedData(@RequestParam String patientUuid) {
+		
+		String json = fetchDataFromExternalApi();
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		try {
+			DpAlerts dpAlerts = objectMapper.readValue(json, DpAlerts.class);
+			JsonNode root = objectMapper.readTree(json);
+			JsonNode dataNode = root.get("data");
+			String flattenedJson = objectMapper.writeValueAsString(dataNode);
+			
+			if (dpAlerts == null || dpAlerts.getData() == null)
+				throw new IllegalArgumentException();
+			
+			DigipathRestService digipathRestService = Context.getService(DigipathRestService.class);
+			return digipathRestService.getFhirFormattedData(dpAlerts.getData(), flattenedJson, patientUuid);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
+	
 	@RequestMapping(value = "/fetch-data", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
@@ -76,8 +103,6 @@ public class DigipathRestController extends MainResourceController {
 		String json = response.getBody();
 		
 		System.out.println("json fetched " + json);
-		
-		//		return restTemplate.getForObject(url, DpAlerts.class);
 		
 		return json;
 	}

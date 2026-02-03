@@ -1,6 +1,7 @@
 package org.openmrs.module.digipath.connector.api.impl;
 
 import net.openclinical.beans.DataDefinition;
+import net.openclinical.proforma.enactment.EnactmentOptions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.impl.BaseOpenmrsService;
@@ -37,6 +38,11 @@ public class DigipathRestServiceImpl extends BaseOpenmrsService implements Digip
 	@Override
 	public List<Map<String, Object>> performProforma(DpAlertsData dpAlertsData, String json, String patientUuid) {
 		return dao.performProforma(dpAlertsData, json, patientUuid);
+	}
+	
+	@Override
+	public Map<String, Object> getFhirFormattedData(DpAlertsData dpAlertsData, String json, String patientUuid) {
+		return dao.getFhirFormattedData(dpAlertsData, json, patientUuid);
 	}
 	
 }
