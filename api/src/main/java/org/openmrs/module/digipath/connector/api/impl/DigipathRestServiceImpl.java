@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.digipath.connector.api.DigipathRestService;
 import org.openmrs.module.digipath.connector.api.dao.DigipathRestDao;
+import org.openmrs.module.digipath.connector.proforma.DigipathConnector;
 import org.openmrs.module.digipath.connector.proforma.DpAlertsData;
 
 import java.util.List;
@@ -43,6 +44,11 @@ public class DigipathRestServiceImpl extends BaseOpenmrsService implements Digip
 	@Override
 	public Map<String, Object> getFhirFormattedData(DpAlertsData dpAlertsData, String json, String patientUuid) {
 		return dao.getFhirFormattedData(dpAlertsData, json, patientUuid);
+	}
+	
+	@Override
+	public DigipathConnector saveDigipathConnectorData(DigipathConnector digipathConnector) {
+		return dao.saveDigipathConnectorData(digipathConnector);
 	}
 	
 }

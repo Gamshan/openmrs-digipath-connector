@@ -2,8 +2,7 @@ package org.openmrs.module.digipath.connector.api.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import net.openclinical.beans.DataDefinition;
 import net.openclinical.beans.Fhir;
 import net.openclinical.proforma.Protocol;
@@ -11,15 +10,14 @@ import net.openclinical.proforma.enactment.Enactment;
 import net.openclinical.proforma.enactment.EnactmentOptions;
 import net.openclinical.proforma.enactment.EnactmentStatus;
 import net.openclinical.proforma.tasks.Task;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.digipath.connector.proforma.DataDefinitionEvaluator;
-import org.openmrs.module.digipath.connector.proforma.DataDefinitionFactory;
-import org.openmrs.module.digipath.connector.proforma.DpAlerts;
-import org.openmrs.module.digipath.connector.proforma.DpAlertsData;
+import org.openmrs.module.digipath.connector.proforma.*;
 
+import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,6 +40,21 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 		return sessionFactory;
 	}
 	
+	private Session getCurrentSession() {
+		try {
+			return sessionFactory.getCurrentSession();
+		}
+		catch (NoSuchMethodError ex) {
+			try {
+				Method method = sessionFactory.getClass().getMethod("getCurrentSession", null);
+				return (Session) method.invoke(sessionFactory, null);
+			}
+			catch (Exception e) {
+				throw new RuntimeException("Failed to get the current hibernate session from HibernateDepartmentDAO", e);
+			}
+		}
+	}
+	
 	@Override
 	public List<Map<String, Object>> performProforma(DpAlertsData dpAlertsData, String json, String patientUuid) {
 		
@@ -54,12 +67,13 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 	private Map<String, List<EnactmentOptions.TimestampedValue>> getDataForDataDefinitions(DpAlertsData dpAlertsData, String patientUuid){
 			List<DataDefinition> dataDefinitionList = dpAlertsData.getDataDefinitions();
 			Map<String, List<EnactmentOptions.TimestampedValue>> result = new HashMap<>();
-
 			PatientService patientService = Context.getService(PatientService.class);
-
 			Patient patient = patientService.getPatientByUuid(patientUuid);
 
 			dataDefinitionList.forEach(dataDefinition -> {
+
+				if(dataDefinition.hasValueCondition())
+					return;
 
 				if(dataDefinition.getMeta() != null && dataDefinition.getMeta().getFhir() != null) {
 					List<EnactmentOptions.TimestampedValue> timestampedValueList = getDataByCodeAndPatient(dataDefinition.getMeta().getFhir(), patient, null);
@@ -85,11 +99,45 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 
 		try {
 
-			Map<String, Map<String, List<EnactmentOptions.TimestampedValue>>> enactmentData = new HashMap<>();
-			enactmentData.put(dpAlertsData.getName(), listMap);
-			System.out.println("EXECUTE 11111" + dpAlertsData.getName());
-
 			Task protocol = Protocol.inflate(json);
+
+
+
+
+
+
+
+			String protocolName = protocol.getName();
+
+			Map<String, List<EnactmentOptions.TimestampedValue>> taskData = new HashMap<>();
+			EnactmentOptions.TimestampedValue conditionsOne  = new EnactmentOptions.TimestampedValue(Instant.parse("2025-12-04T10:00:00Z"), List.of("diabetes"));
+			List<EnactmentOptions.TimestampedValue> conditions = List.of(conditionsOne);
+
+			taskData.put("hba1c", new ArrayList<>());
+			taskData.put("serum_creatinine", new ArrayList<>());
+			taskData.put("conditions", conditions);
+			taskData.put("dob", List.of(new EnactmentOptions.TimestampedValue(Instant.parse("2025-05-01T10:00:00Z"), "1977-02-19")));
+			taskData.put("gender", List.of(new EnactmentOptions.TimestampedValue(Instant.parse("2025-05-01T10:00:00Z"), "female")));
+
+			Map<String, Map<String, List<EnactmentOptions.TimestampedValue>>> data = new HashMap<>();
+
+
+
+
+
+
+
+			Map<String, Map<String, List<EnactmentOptions.TimestampedValue>>> enactmentData = new HashMap<>();
+
+			enactmentData.put(protocolName, taskData);
+
+			System.out.println("EXECUTE 11111" + enactmentData);
+
+			listMap.forEach((key,value)->{
+				System.out.println("EXECUTE" + key + value.size());
+			});
+
+
 			System.out.println("EXECUTE 22222" + protocol.isValid());
 			EnactmentOptions enactmentOptions = new EnactmentOptions();
 			enactmentOptions.setData(enactmentData);
@@ -98,7 +146,10 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 			System.out.println("EXECUTE 4444444");
 			Enactment enactment = new Enactment(protocol, enactmentOptions);
 			System.out.println("EXECUTE 555555" +  enactment.getStatus().isStarted() +  enactment.getStatus().isFinished() +  enactment.getStatus().getCompleteable() + enactment.getStatus().getCancellable());
+
 			System.out.println("EXECUTE 5555551 1" +  enactment.getData());
+			System.out.println("EXECUTE Includes" +  enactment.evaluate("is_known(\"hba1c\")"));
+
 			List<Map<String,Object>> recommendations = getRecommendations(enactment);
 			System.out.println(recommendations);
 			return Optional.ofNullable(recommendations).orElse(new ArrayList<>());
@@ -127,11 +178,9 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 	
 	private List<EnactmentOptions.TimestampedValue> getDataByCodeAndPatient(Fhir fhir, Patient patient, String value) {
 		if (fhir.getResourceType() != null) {
-			System.out.println("Inside getValueOfDataDefinition");
 			DataDefinitionEvaluator dataDefinitionEvaluator = DataDefinitionFactory.get(fhir.getResourceType());
 			List<EnactmentOptions.TimestampedValue> timestampedValueList = dataDefinitionEvaluator.evaluate(fhir, patient,
 			    value);
-			System.out.println("getValueOfDataDefinition object" + timestampedValueList);
 			return timestampedValueList;
 		}
 		return null;
@@ -143,5 +192,10 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 						Map.Entry::getKey,
 						Map.Entry::getValue // Value is already a List, which is an Object
 				));
+	}
+	
+	public DigipathConnector saveDigipathConnectorData(DigipathConnector digipathConnector) {
+		getCurrentSession().save(digipathConnector);
+		return digipathConnector;
 	}
 }

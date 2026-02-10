@@ -6,6 +6,7 @@ import net.openclinical.beans.DataDefinition;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.digipath.connector.api.DigipathRestService;
+import org.openmrs.module.digipath.connector.proforma.DigipathConnector;
 import org.openmrs.module.digipath.connector.proforma.DpAlerts;
 import org.openmrs.module.digipath.connector.proforma.DpAlertsData;
 import org.springframework.http.HttpStatus;
@@ -106,4 +107,15 @@ public class DigipathRestController extends MainResourceController {
 		
 		return json;
 	}
+	
+	@RequestMapping(value = "/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	@ResponseBody
+	public DigipathConnector saveDigipathConnectorData(@RequestBody DigipathConnector digipathConnector) {
+		
+		DigipathRestService digipathRestService = Context.getService(DigipathRestService.class);
+		
+		return digipathRestService.saveDigipathConnectorData(digipathConnector);
+	}
+	
 }

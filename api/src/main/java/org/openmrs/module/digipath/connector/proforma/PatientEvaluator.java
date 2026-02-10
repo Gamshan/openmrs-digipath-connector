@@ -46,7 +46,6 @@ public class PatientEvaluator implements DataDefinitionEvaluator {
 		Object value = null;
 
 		try {
-			System.out.println("44444444");
 			value = PropertyUtils.getProperty(patient, attribute);
 		} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 
