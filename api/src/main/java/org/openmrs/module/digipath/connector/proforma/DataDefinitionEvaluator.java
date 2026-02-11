@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface DataDefinitionEvaluator {
 	
-	List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value);
+	List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue);
 	
 }

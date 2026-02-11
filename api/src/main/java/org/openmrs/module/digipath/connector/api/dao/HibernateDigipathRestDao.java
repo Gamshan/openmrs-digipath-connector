@@ -76,14 +76,14 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 					return;
 
 				if(dataDefinition.getMeta() != null && dataDefinition.getMeta().getFhir() != null) {
-					List<EnactmentOptions.TimestampedValue> timestampedValueList = getDataByCodeAndPatient(dataDefinition.getMeta().getFhir(), patient, null);
+					List<EnactmentOptions.TimestampedValue> timestampedValueList = getDataByCodeAndPatient(dataDefinition.getMeta().getFhir(), patient, null, dataDefinition.isMultiValued());
 					if(timestampedValueList != null)
 						result.put(dataDefinition.getName(), timestampedValueList);
 				}else if(dataDefinition.getRange() != null){
 					List<EnactmentOptions.TimestampedValue> valueList = new ArrayList<>();
 					dataDefinition.getRange().forEach(range -> {
 						if(range.getMeta() != null && range.getMeta().getFhir() != null) {
-							List<EnactmentOptions.TimestampedValue> timestampedValueList = getDataByCodeAndPatient(range.getMeta().getFhir(), patient, range.getValue());
+							List<EnactmentOptions.TimestampedValue> timestampedValueList = getDataByCodeAndPatient(range.getMeta().getFhir(), patient, range.getValue(), range.isMultiValue() );
 							if(timestampedValueList != null)
 								valueList.addAll(timestampedValueList);
 						}
@@ -100,36 +100,9 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 		try {
 
 			Task protocol = Protocol.inflate(json);
-
-
-
-
-
-
-
 			String protocolName = protocol.getName();
-
-			Map<String, List<EnactmentOptions.TimestampedValue>> taskData = new HashMap<>();
-			EnactmentOptions.TimestampedValue conditionsOne  = new EnactmentOptions.TimestampedValue(Instant.parse("2025-12-04T10:00:00Z"), List.of("diabetes"));
-			List<EnactmentOptions.TimestampedValue> conditions = List.of(conditionsOne);
-
-			taskData.put("hba1c", new ArrayList<>());
-			taskData.put("serum_creatinine", new ArrayList<>());
-			taskData.put("conditions", conditions);
-			taskData.put("dob", List.of(new EnactmentOptions.TimestampedValue(Instant.parse("2025-05-01T10:00:00Z"), "1977-02-19")));
-			taskData.put("gender", List.of(new EnactmentOptions.TimestampedValue(Instant.parse("2025-05-01T10:00:00Z"), "female")));
-
-			Map<String, Map<String, List<EnactmentOptions.TimestampedValue>>> data = new HashMap<>();
-
-
-
-
-
-
-
 			Map<String, Map<String, List<EnactmentOptions.TimestampedValue>>> enactmentData = new HashMap<>();
-
-			enactmentData.put(protocolName, taskData);
+			enactmentData.put(protocolName, listMap);
 
 			System.out.println("EXECUTE 11111" + enactmentData);
 
@@ -176,11 +149,12 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 		return recommendations;
 	}
 	
-	private List<EnactmentOptions.TimestampedValue> getDataByCodeAndPatient(Fhir fhir, Patient patient, String value) {
+	private List<EnactmentOptions.TimestampedValue> getDataByCodeAndPatient(Fhir fhir, Patient patient, String value,
+	        boolean isMultiValue) {
 		if (fhir.getResourceType() != null) {
 			DataDefinitionEvaluator dataDefinitionEvaluator = DataDefinitionFactory.get(fhir.getResourceType());
 			List<EnactmentOptions.TimestampedValue> timestampedValueList = dataDefinitionEvaluator.evaluate(fhir, patient,
-			    value);
+			    value, isMultiValue);
 			return timestampedValueList;
 		}
 		return null;

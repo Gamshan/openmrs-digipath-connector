@@ -18,7 +18,7 @@ public class MedicationEvaluator implements DataDefinitionEvaluator {
 	OrderService orderService = Context.getService(OrderService.class);
 	
 	@Override
-	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value) {
+	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue) {
 		
 		System.out.println(" MedicationEvaluator " + 111111);
 		List<EnactmentOptions.TimestampedValue> timestampedValueList;

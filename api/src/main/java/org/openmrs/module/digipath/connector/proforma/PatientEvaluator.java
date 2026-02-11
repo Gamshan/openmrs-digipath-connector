@@ -18,7 +18,7 @@ import java.util.Objects;
 public class PatientEvaluator implements DataDefinitionEvaluator {
 	
 	@Override
-	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value) {
+	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue) {
 		
 		System.out.println(" PatientEvaluator " + 111111);
 		List<EnactmentOptions.TimestampedValue> timestampedValueList = extractAllDataForCode(patient, fhir.getElement());

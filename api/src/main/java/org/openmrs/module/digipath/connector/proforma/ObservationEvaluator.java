@@ -24,14 +24,14 @@ public class ObservationEvaluator implements DataDefinitionEvaluator {
 	ObsService obsService = Context.getService(ObsService.class);
 	
 	@Override
-	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value) {
+	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue) {
 		
 		System.out.println(" ObservationEvaluator " + 111111);
 		
 		List<EnactmentOptions.TimestampedValue> list;
 		switch (fhir.getElement()) {
 			case "code":
-				list = extractDataByPatientAndCode(fhir.getCode(), patient, true);
+				list = extractDataByPatientAndCode(fhir.getCode(), patient, isMultiValue);
 				break;
 			default:
 				throw new IllegalArgumentException();
