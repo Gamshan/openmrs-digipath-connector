@@ -172,4 +172,10 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 		getCurrentSession().save(digipathConnector);
 		return digipathConnector;
 	}
+	
+	@Override
+	public List<DigipathConnector> getAllDigipathConnectorData() {
+		return (List<DigipathConnector>) getCurrentSession().createCriteria(DigipathConnector.class).list();
+	}
+	
 }

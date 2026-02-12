@@ -16,4 +16,6 @@ public interface DigipathRestDao {
 	
 	DigipathConnector saveDigipathConnectorData(DigipathConnector digipathConnector);
 	
+	List<DigipathConnector> getAllDigipathConnectorData();
+	
 }

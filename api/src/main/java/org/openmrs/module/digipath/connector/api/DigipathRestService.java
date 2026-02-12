@@ -22,4 +22,6 @@ public interface DigipathRestService extends OpenmrsService {
 	
 	DigipathConnector saveDigipathConnectorData(DigipathConnector digipathConnector);
 	
+	List<DigipathConnector> getAllDigipathConnectorData();
+	
 }
