@@ -174,8 +174,33 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<DigipathConnector> getAllDigipathConnectorData() {
-		return (List<DigipathConnector>) getCurrentSession().createCriteria(DigipathConnector.class).list();
+		return (List<DigipathConnector>) getCurrentSession().createQuery("from DigipathConnector where voided = false")
+		        .list();
 	}
 	
+	@Override
+	public DigipathConnector deleteDigipathConnectorData(Integer id) {
+		DigipathConnector digipathConnector = (DigipathConnector) getCurrentSession().get(DigipathConnector.class, id);
+		
+		digipathConnector.setVoided(true);
+		digipathConnector.setVoidedBy(Context.getAuthenticatedUser());
+		digipathConnector.setDateVoided(new Date());
+		digipathConnector.setVoidReason("User deleted from UI");
+		getCurrentSession().saveOrUpdate(digipathConnector);
+		
+		return digipathConnector;
+	}
+	
+	@Override
+	public DigipathConnector getDigipathConnectorDataById(Integer id) {
+		return (DigipathConnector) getCurrentSession().get(DigipathConnector.class, id);
+	}
+	
+	@Override
+	public DigipathConnector updateDigipathConnector(Integer id, DigipathConnector digipathConnector) {
+		getCurrentSession().saveOrUpdate(digipathConnector);
+		return digipathConnector;
+	}
 }

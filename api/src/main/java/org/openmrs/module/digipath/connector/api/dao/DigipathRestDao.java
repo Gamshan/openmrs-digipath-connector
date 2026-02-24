@@ -18,4 +18,10 @@ public interface DigipathRestDao {
 	
 	List<DigipathConnector> getAllDigipathConnectorData();
 	
+	DigipathConnector deleteDigipathConnectorData(Integer id);
+	
+	DigipathConnector getDigipathConnectorDataById(Integer id);
+	
+	DigipathConnector updateDigipathConnector(Integer id, DigipathConnector digipathConnector);
+	
 }

@@ -11,5 +11,21 @@
         <property name="url" type="java.lang.String" column="url" length="255" not-null="true"/>
         <property name="username" type="java.lang.String" column="username" length="255"/>
         <property name="description" type="java.lang.String" column="description" length="255"/>
+        <property name="protocol" type="java.lang.String" column="protocol"/>
+
+        <property name="voided" type="boolean" not-null="true"/>
+
+        <many-to-one name="voidedBy"
+                     class="org.openmrs.User"
+                     column="voided_by"/>
+
+        <property name="dateVoided" type="timestamp">
+            <column name="date_voided"/>
+        </property>
+
+        <property name="voidReason" type="string">
+            <column name="void_reason" length="255"/>
+        </property>
+
     </class>
 </hibernate-mapping>

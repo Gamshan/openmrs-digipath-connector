@@ -55,4 +55,19 @@ public class DigipathRestServiceImpl extends BaseOpenmrsService implements Digip
 	public List<DigipathConnector> getAllDigipathConnectorData() {
 		return dao.getAllDigipathConnectorData();
 	}
+	
+	@Override
+	public DigipathConnector deleteDigipathConnectorData(Integer id) {
+		return dao.deleteDigipathConnectorData(id);
+	}
+	
+	@Override
+	public DigipathConnector getDigipathConnectorDataById(Integer id) {
+		return dao.getDigipathConnectorDataById(id);
+	}
+	
+	@Override
+	public DigipathConnector updateDigipathConnector(Integer id, DigipathConnector digipathConnector) {
+		return dao.updateDigipathConnector(id, digipathConnector);
+	}
 }

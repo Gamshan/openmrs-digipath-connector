@@ -62,7 +62,8 @@ public class DigipathRestController extends MainResourceController {
 						try {
 							Context.openSession();
 							Context.authenticate("admin", "Admin123");
-							String response = fetchDataFromExternalApi(digipathConnector.getUrl());
+//							String response = fetchDataFromExternalApi(digipathConnector.getUrl());
+							String response = digipathConnector.getProtocol();
 							return executeProtocol(patientUuid, response);
 						} finally {
 							Context.closeSession();

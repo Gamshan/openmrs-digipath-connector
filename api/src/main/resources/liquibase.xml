@@ -48,7 +48,34 @@
             </column>
             <column name="username" type="VARCHAR(255)" />
             <column name="description" type="VARCHAR(255)" />
+            <column name="protocol" type="TEXT" />
         </createTable>
+    </changeSet>
+
+
+    <changeSet id="add-void-columns-digipath" author="gamshan">
+
+        <addColumn tableName="digipath_connector">
+
+            <column name="voided" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="voided_by" type="int"/>
+
+            <column name="date_voided" type="datetime"/>
+
+            <column name="void_reason" type="varchar(255)"/>
+
+        </addColumn>
+
+        <addForeignKeyConstraint
+                baseTableName="digipath_connector"
+                baseColumnNames="voided_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"
+                constraintName="fk_digipath_connector_voided_by"/>
+
     </changeSet>
  
 </databaseChangeLog>

@@ -45,6 +45,7 @@ public class AdminList extends AdministrationSectionExt {
 		
 		map.put("module/digipath.connector/digipath.connector.form", "digipath.connector.title");
 		map.put("digipath.connector/digipath.connector.page", "digipath.connector.refapp.title");
+		map.put("digipath.connector/config.page", "Config Data");
 		
 		return map;
 	}

@@ -18,6 +18,8 @@ public class DigipathConnector extends BaseOpenmrsData implements Serializable {
 	
 	private String description;
 	
+	private String protocol;
+	
 	public Integer getDigipathConnectorId() {
 		return digipathConnectorId;
 	}
@@ -58,5 +60,13 @@ public class DigipathConnector extends BaseOpenmrsData implements Serializable {
 	@Override
 	public void setId(Integer id) {
 		setDigipathConnectorId(id);
+	}
+	
+	public String getProtocol() {
+		return protocol;
+	}
+	
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
 	}
 }
