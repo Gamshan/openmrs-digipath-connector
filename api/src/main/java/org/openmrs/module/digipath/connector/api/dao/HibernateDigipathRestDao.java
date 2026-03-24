@@ -100,6 +100,10 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 		try {
 
 			Task protocol = Protocol.inflate(json);
+
+			System.out.println("json => " + json );
+			System.out.println("protocol " + protocol.isValid());
+
 			String protocolName = protocol.getName();
 			Map<String, Map<String, List<EnactmentOptions.TimestampedValue>>> enactmentData = new HashMap<>();
 			enactmentData.put(protocolName, listMap);
@@ -121,7 +125,7 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 			System.out.println("EXECUTE 555555" +  enactment.getStatus().isStarted() +  enactment.getStatus().isFinished() +  enactment.getStatus().getCompleteable() + enactment.getStatus().getCancellable());
 
 			System.out.println("EXECUTE 5555551 1" +  enactment.getData());
-			System.out.println("EXECUTE Includes" +  enactment.evaluate("is_known(\"hba1c\")"));
+
 
 			List<Map<String,Object>> recommendations = getRecommendations(enactment);
 			System.out.println(recommendations);
@@ -151,6 +155,7 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 	
 	private List<EnactmentOptions.TimestampedValue> getDataByCodeAndPatient(Fhir fhir, Patient patient, String value,
 	        boolean isMultiValue) {
+		System.out.println("isMultiValue " + isMultiValue);
 		if (fhir.getResourceType() != null) {
 			DataDefinitionEvaluator dataDefinitionEvaluator = DataDefinitionFactory.get(fhir.getResourceType());
 			List<EnactmentOptions.TimestampedValue> timestampedValueList = dataDefinitionEvaluator.evaluate(fhir, patient,

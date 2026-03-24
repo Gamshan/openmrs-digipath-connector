@@ -31,7 +31,7 @@ public class ObservationEvaluator implements DataDefinitionEvaluator {
 		List<EnactmentOptions.TimestampedValue> list;
 		switch (fhir.getElement()) {
 			case "code":
-				list = extractDataByPatientAndCode(fhir.getCode(), patient, isMultiValue);
+				list = extractDataByPatientAndCode(fhir.getCode(), patient, true);
 				break;
 			default:
 				throw new IllegalArgumentException();
