@@ -1,8 +1,5 @@
 package org.openmrs.module.digipath.connector.api.dao;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import net.openclinical.beans.DataDefinition;
 import net.openclinical.beans.Fhir;
 import net.openclinical.proforma.Protocol;
@@ -101,9 +98,6 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 
 			Task protocol = Protocol.inflate(json);
 
-			System.out.println("json => " + json );
-			System.out.println("protocol " + protocol.isValid());
-
 			String protocolName = protocol.getName();
 			Map<String, Map<String, List<EnactmentOptions.TimestampedValue>>> enactmentData = new HashMap<>();
 			enactmentData.put(protocolName, listMap);
@@ -128,8 +122,12 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 
 
 			List<Map<String,Object>> recommendations = getRecommendations(enactment);
-			System.out.println(recommendations);
-			return Optional.ofNullable(recommendations).orElse(new ArrayList<>());
+			System.out.println("<========================================>");
+			List<Map<String,Object>> cc = Optional.ofNullable(recommendations).orElse(new ArrayList<>());
+
+			System.out.println( "KKKK" + cc);
+
+			return cc;
 		}
 		catch (Protocol.ProtocolParseException e) {
 			throw new Error("ProtocolParseException " + e);
@@ -140,13 +138,18 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 	public List<Map<String, Object>>  getRecommendations(Enactment enactment) {
 		List<Map<String, Object>> recommendations = new ArrayList<>();
 		EnactmentStatus enactmentStatus = enactment.getStatus();
+		System.out.println("HEREE 1111 " + enactment.getStatus());
 		if (enactmentStatus.isStarted() && !enactmentStatus.isFinished()) {
 			if (enactmentStatus.getCompleteable().isEmpty()) {
+				System.out.println("HEREE 2 ");
 				return null;
 			}
 			List<String> completable = enactmentStatus.getCompleteable();
 			for (String completableTask : completable) {
+				System.out.println("Here 3333 " + completable);
+				System.out.println("Here 44444 " + completableTask);
 				Map<String, Object> component = enactment.getComponent(completableTask);
+				System.out.println("Here 555555 " + component);
 				recommendations.add(component);
 			}
 		}
