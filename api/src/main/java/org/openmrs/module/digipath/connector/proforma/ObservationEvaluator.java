@@ -3,6 +3,7 @@ package org.openmrs.module.digipath.connector.proforma;
 import net.openclinical.beans.Code;
 import net.openclinical.beans.DataDefinition;
 import net.openclinical.beans.Fhir;
+import net.openclinical.beans.Range;
 import net.openclinical.proforma.Protocol;
 import net.openclinical.proforma.enactment.EnactmentOptions;
 import net.openclinical.proforma.tasks.Task;
@@ -24,14 +25,13 @@ public class ObservationEvaluator implements DataDefinitionEvaluator {
 	ObsService obsService = Context.getService(ObsService.class);
 	
 	@Override
-	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue) {
-		
-		System.out.println(" ObservationEvaluator " + 111111);
+	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue,
+	        List<Range> rangeList) {
 		
 		List<EnactmentOptions.TimestampedValue> list;
 		switch (fhir.getElement()) {
 			case "code":
-				list = extractDataByPatientAndCode(fhir.getCode(), patient, true);
+				list = extractDataByPatientAndCode(fhir.getCode(), patient, isMultiValue, rangeList);
 				break;
 			default:
 				throw new IllegalArgumentException();
@@ -40,15 +40,27 @@ public class ObservationEvaluator implements DataDefinitionEvaluator {
 		return list;
 	}
 	
-	private List<EnactmentOptions.TimestampedValue> extractDataByPatientAndCode(Code code, Patient patient, boolean isMultiValue) {
+	private List<EnactmentOptions.TimestampedValue> extractDataByPatientAndCode(Code code, Patient patient, boolean isMultiValue, List<Range> rangeList) {
 		Concept concept = DigipathUtils.getConceptByCode(code);
 		List<Obs> obsList = obsService.getObservationsByPersonAndConcept(patient, concept);
 		List<EnactmentOptions.TimestampedValue> timestampedValueList = new ArrayList<>();
 
+
 		obsList.forEach(obs -> {
 			if(obs.getValueNumeric() != null && (isMultiValue || timestampedValueList.isEmpty()))
 				timestampedValueList.add(new EnactmentOptions.TimestampedValue(obs.getDateCreated().toInstant(), obs.getValueNumeric()));
+			else if(obs.getValueCoded() != null && rangeList != null && (isMultiValue || timestampedValueList.isEmpty())) {
+				rangeList.forEach(range -> {
+					if(range.getMeta() != null && range.getMeta().getFhir() != null) {
+						Concept rangeConcept = DigipathUtils.getConceptByCode(range.getMeta().getFhir().getCode());
+						if(rangeConcept.getUuid().equals(obs.getValueCoded().getUuid())){
+							timestampedValueList.add(new EnactmentOptions.TimestampedValue(obs.getDateCreated().toInstant(), range.getValue()));
+							}
+						}
+				});
+			}
 		});
+
 		return timestampedValueList;
 
     }

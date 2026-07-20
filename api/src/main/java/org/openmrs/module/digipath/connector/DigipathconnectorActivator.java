@@ -11,7 +11,13 @@ package org.openmrs.module.digipath.connector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Encounter;
+import org.openmrs.api.context.Context;
+import org.openmrs.event.Event;
+import org.openmrs.event.EventEngine;
 import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.module.DaemonToken;
+import org.openmrs.module.digipath.connector.listener.EncounterEventListenerImpl;
 
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
@@ -23,8 +29,23 @@ public class DigipathconnectorActivator extends BaseModuleActivator {
 	/**
 	 * @see #started()
 	 */
+	
+	private EncounterEventListenerImpl encounterEventListener;
+	
+	private DaemonToken daemonToken;
+	
+	// OpenMRS will automatically inject the token here before calling started()
+	public void setDaemonToken(DaemonToken token) {
+		this.daemonToken = token;
+	}
+	
 	public void started() {
-		log.info("Started Digipath.connector");
+		
+		if (encounterEventListener == null) {
+			encounterEventListener = new EncounterEventListenerImpl(daemonToken);
+		}
+		// Subscribe specifically to CREATED actions on Encounter objects
+		Event.subscribe(Encounter.class, String.valueOf(Event.Action.CREATED), encounterEventListener);
 	}
 	
 	/**
@@ -32,6 +53,9 @@ public class DigipathconnectorActivator extends BaseModuleActivator {
 	 */
 	public void shutdown() {
 		log.info("Shutdown Digipath.connector");
+		if (encounterEventListener != null) {
+			Event.unsubscribe(Encounter.class, Event.Action.CREATED, encounterEventListener);
+		}
 	}
 	
 }

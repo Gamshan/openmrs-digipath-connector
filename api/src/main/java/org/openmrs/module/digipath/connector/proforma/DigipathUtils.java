@@ -18,15 +18,11 @@ public class DigipathUtils {
 			;
 			switch (coding.getSystem()) {
 				case "https://cielterminology.org/":
-					System.out.println(" CIEL here " + coding.getCode());
+				case "https://cielterminology.org":
 					concept = getConcept("CIEL", coding.getCode());
-					
-					break;
-				case "custom":
-					concept = conceptService.getConceptByUuid(coding.getCode());
 					break;
 				default:
-					concept = conceptService.getConceptByMapping(coding.getSystem(), coding.getCode());
+					concept = conceptService.getConceptByUuid(coding.getCode());
 					break;
 			}
 			
