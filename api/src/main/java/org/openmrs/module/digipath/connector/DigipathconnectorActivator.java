@@ -17,12 +17,13 @@ import org.openmrs.event.Event;
 import org.openmrs.event.EventEngine;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.DaemonToken;
+import org.openmrs.module.DaemonTokenAware;
 import org.openmrs.module.digipath.connector.listener.EncounterEventListenerImpl;
 
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
  */
-public class DigipathconnectorActivator extends BaseModuleActivator {
+public class DigipathconnectorActivator extends BaseModuleActivator implements DaemonTokenAware {
 	
 	private Log log = LogFactory.getLog(this.getClass());
 	
@@ -42,8 +43,10 @@ public class DigipathconnectorActivator extends BaseModuleActivator {
 	public void started() {
 		
 		if (encounterEventListener == null) {
+			System.out.println("XXXXXXX Started");
 			encounterEventListener = new EncounterEventListenerImpl(daemonToken);
 		}
+		System.out.println("XXXXXXX Not Started");
 		// Subscribe specifically to CREATED actions on Encounter objects
 		Event.subscribe(Encounter.class, String.valueOf(Event.Action.CREATED), encounterEventListener);
 	}
