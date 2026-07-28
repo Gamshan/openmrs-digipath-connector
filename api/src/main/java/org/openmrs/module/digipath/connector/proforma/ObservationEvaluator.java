@@ -24,14 +24,14 @@ public class ObservationEvaluator implements DataDefinitionEvaluator {
 	ObsService obsService = Context.getService(ObsService.class);
 	
 	@Override
-	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value) {
+	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue) {
 		
-		System.out.println(" ObservationEvaluator " + 111111);
+		System.out.println(" ObservationEvaluator " + 111111 + value);
 		
 		List<EnactmentOptions.TimestampedValue> list;
 		switch (fhir.getElement()) {
 			case "code":
-				list = extractDataByPatientAndCode(fhir.getCode(), patient, true);
+				list = extractDataByPatientAndCode(fhir.getCode(), patient, isMultiValue);
 				break;
 			default:
 				throw new IllegalArgumentException();
@@ -42,8 +42,13 @@ public class ObservationEvaluator implements DataDefinitionEvaluator {
 	
 	private List<EnactmentOptions.TimestampedValue> extractDataByPatientAndCode(Code code, Patient patient, boolean isMultiValue) {
 		Concept concept = DigipathUtils.getConceptByCode(code);
+
+		System.out.println("GGGG" + concept + code );
+
 		List<Obs> obsList = obsService.getObservationsByPersonAndConcept(patient, concept);
 		List<EnactmentOptions.TimestampedValue> timestampedValueList = new ArrayList<>();
+
+		System.out.println("GGGG => " + obsList.size());
 
 		obsList.forEach(obs -> {
 			if(obs.getValueNumeric() != null && (isMultiValue || timestampedValueList.isEmpty()))

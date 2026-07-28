@@ -10,6 +10,7 @@ public class DataDefinitionFactory {
 			case "Condition":
 				return new ConditionEvaluator();
 			case "Medication":
+			case "MedicationRequest":
 				return new MedicationEvaluator();
 			case "Patient":
 				return new PatientEvaluator();

@@ -12,4 +12,3 @@ Hello, world.
     You are not logged in.
 <% } %>
 
-${ ui.includeFragment("digipath.connector", "users") }

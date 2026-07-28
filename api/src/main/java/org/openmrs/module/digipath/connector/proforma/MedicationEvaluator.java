@@ -18,9 +18,9 @@ public class MedicationEvaluator implements DataDefinitionEvaluator {
 	OrderService orderService = Context.getService(OrderService.class);
 	
 	@Override
-	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value) {
+	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue) {
 		
-		System.out.println(" MedicationEvaluator " + 111111);
+		System.out.println(" MedicationEvaluator " + 111111 + value);
 		List<EnactmentOptions.TimestampedValue> timestampedValueList;
 		
 		switch (fhir.getElement()) {
@@ -37,6 +37,8 @@ public class MedicationEvaluator implements DataDefinitionEvaluator {
 	private List<EnactmentOptions.TimestampedValue> extractAllDataForCode(Code code, Patient patient, String value) {
 		List<EnactmentOptions.TimestampedValue> list = new ArrayList<>();
 		Concept concept = DigipathUtils.getConceptByCode(code);
+		if(concept == null)
+			return  null;
 		Optional<Order> optionalOrder = orderService.getOrderHistoryByConcept(patient, concept).stream().findFirst();
 		Date date = optionalOrder.map(Order::getDateActivated).orElse(null);
 		if(date != null)

@@ -119,6 +119,12 @@
 		<file>messages_es.properties</file>
 	</messages>
 	<!-- /Internationalization -->
+
+
+
+	<mappingFiles>
+		DigipathConnector.hbm.xml
+	</mappingFiles>
 	
 </module>
 

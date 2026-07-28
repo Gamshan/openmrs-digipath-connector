@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping package="org.openmrs.module.digipath.connector.proforma">
+    <class name="org.openmrs.module.digipath.connector.proforma.DigipathConnector" table="digipath_connector">
+        <id name="digipathConnectorId" type="int" column="digipath_connector_id" unsaved-value="0">
+            <generator class="identity"/>
+        </id>
+        <discriminator column="digipath_connector_id" insert="false" />
+        <property name="url" type="java.lang.String" column="url" length="255" not-null="true"/>
+        <property name="username" type="java.lang.String" column="username" length="255"/>
+        <property name="description" type="java.lang.String" column="description" length="255"/>
+        <property name="protocol" type="java.lang.String" column="protocol"/>
+
+        <property name="voided" type="boolean" not-null="true"/>
+
+        <many-to-one name="voidedBy"
+                     class="org.openmrs.User"
+                     column="voided_by"/>
+
+        <property name="dateVoided" type="timestamp">
+            <column name="date_voided"/>
+        </property>
+
+        <property name="voidReason" type="string">
+            <column name="void_reason" length="255"/>
+        </property>
+
+    </class>
+</hibernate-mapping>

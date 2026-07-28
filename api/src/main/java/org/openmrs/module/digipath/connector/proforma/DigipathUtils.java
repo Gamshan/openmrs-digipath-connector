@@ -17,15 +17,17 @@ public class DigipathUtils {
 		for (Coding coding : code.getCoding()) {
 			;
 			switch (coding.getSystem()) {
+				case "https://cielterminology.org":
 				case "https://cielterminology.org/":
 					System.out.println(" CIEL here " + coding.getCode());
 					concept = getConcept("CIEL", coding.getCode());
 					
 					break;
-				case "https://example.org/":
+				case "custom":
+					concept = conceptService.getConceptByUuid(coding.getCode());
 					break;
 				default:
-					concept = conceptService.getConceptByMapping(coding.getSystem(), coding.getCode());
+					concept = conceptService.getConceptByUuid(coding.getCode());
 					break;
 			}
 			
@@ -43,7 +45,14 @@ public class DigipathUtils {
 		ConceptService conceptService = Context.getService(ConceptService.class);
 		
 		ConceptSource source = Context.getConceptService().getConceptSourceByName(system);
+		
 		ConceptReferenceTerm term = conceptService.getConceptReferenceTermByCode(code, source);
+		if (term == null) {
+			System.out.println("No ConceptReferenceTerm found" + code);
+			return null;
+		}
+		
+		System.out.println("GGGG  3333333" + term + " " + term.getCode() + " " + source.getName());
 		
 		return conceptService.getConceptByMapping(term.getCode(), source.getName(), false);
 		

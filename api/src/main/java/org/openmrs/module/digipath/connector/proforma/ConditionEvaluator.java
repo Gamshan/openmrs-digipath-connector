@@ -20,7 +20,7 @@ public class ConditionEvaluator implements DataDefinitionEvaluator {
 	ConditionService conditionService = Context.getService(ConditionService.class);
 	
 	@Override
-	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value) {
+	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue) {
 		
 		System.out.println(" ConditionEvaluator " + 111111);
 		List<EnactmentOptions.TimestampedValue> list;
