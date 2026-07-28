@@ -17,8 +17,8 @@ public class DigipathUtils {
 		for (Coding coding : code.getCoding()) {
 			;
 			switch (coding.getSystem()) {
-				case "https://cielterminology.org/":
 				case "https://cielterminology.org":
+				case "https://cielterminology.org/":
 					concept = getConcept("CIEL", coding.getCode());
 					break;
 				default:

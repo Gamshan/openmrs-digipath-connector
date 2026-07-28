@@ -42,6 +42,9 @@ public class ObservationEvaluator implements DataDefinitionEvaluator {
 	
 	private List<EnactmentOptions.TimestampedValue> extractDataByPatientAndCode(Code code, Patient patient, boolean isMultiValue, List<Range> rangeList) {
 		Concept concept = DigipathUtils.getConceptByCode(code);
+
+		System.out.println("GGGG" + concept + code );
+
 		List<Obs> obsList = obsService.getObservationsByPersonAndConcept(patient, concept);
 		List<EnactmentOptions.TimestampedValue> timestampedValueList = new ArrayList<>();
 
