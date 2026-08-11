@@ -60,6 +60,11 @@ The system consists of the following main components:
 
 ---
 
+## Data Flow
+![Digipaths Connector Data Workflow](docs/images/module_workflow.png)
+
+---
+
 ## Workflow
 
 The typical workflow for requesting clinical recommendations is:
@@ -94,37 +99,6 @@ The generated recommendations are displayed to the clinician through the OpenMRS
 
 ---
 
-## Data Flow
-
-```text
-OpenMRS Patient Dashboard
-          │
-          ▼
-   Request Recommendations
-          │
-          ▼
- Query Active Clinical Rules
-          │
-          ▼
-    Query Patient Data
-          │
-          ▼
-      FHIR Mapper
-          │
-          ▼
-   FHIR Patient Data
-          │
-          ▼
-   Proforma Rule Engine
-          │
-          ▼
-    Recommendations
-          │
-          ▼
- OpenMRS Patient Dashboard
-```
-
----
 
 ## Key Features
 
@@ -196,6 +170,11 @@ This mapping allows the Proforma engine to evaluate clinical information using a
 ## Configuration
 
 Before using the Digipaths Connector, an administrator must configure the connection to the Open Clinical platform.
+
+## Admin UI 
+![Digipaths Connector Admin Config UI](docs/images/admin_config_ui.png)
+
+---
 
 ### Required Configuration
 
@@ -488,14 +467,3 @@ When contributing:
 5. Submit a pull request with a clear description of the changes.
 
 ---
-
-## License
-
-Add the project's license information here.
-
-For example:
-
-```text
-This project is licensed under the [LICENSE NAME].
-See the LICENSE file for details.
-```
