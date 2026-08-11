@@ -21,19 +21,18 @@ public class EncounterEventListenerImpl implements EventListener {
 	private final Log log = LogFactory.getLog(this.getClass());
 	
 	private DaemonToken daemonToken;
-
+	
 	public EncounterEventListenerImpl(DaemonToken daemonToken) {
 		this.daemonToken = daemonToken;
 	}
 	
 	@Override
 	public void onMessage(Message message) {
-
 		
 		if (message instanceof MapMessage) {
 			MapMessage mapMessage = (MapMessage) message;
 			try {
-
+				
 				final String encounterUuid = mapMessage.getString("uuid");
 				Daemon.runInDaemonThread(new Runnable() {
 					
@@ -72,7 +71,7 @@ public class EncounterEventListenerImpl implements EventListener {
 		if (concept == null || concept.getConceptClass() == null) {
 			return false;
 		}
-
+		
 		String className = concept.getConceptClass().getName();
 		
 		return "Diagnosis".equalsIgnoreCase(className) || "Finding".equalsIgnoreCase(className);
@@ -82,7 +81,6 @@ public class EncounterEventListenerImpl implements EventListener {
 		try {
 			ConditionService conditionService = Context.getConditionService();
 			java.util.List<Condition> activeConditions = conditionService.getActiveConditions(encounter.getPatient());
-
 			
 			for (Condition existingCondition : activeConditions) {
 				if (existingCondition != null && existingCondition.getCondition().getCoded().equals(concept)) {
@@ -105,7 +103,7 @@ public class EncounterEventListenerImpl implements EventListener {
 			condition.setDateCreated(new Date());
 			condition.setVoided(false);
 			conditionService.saveCondition(condition);
-
+			
 		}
 		catch (Exception e) {
 			log.error("Failed to persist condition to OpenMRS platform database infrastructure", e);

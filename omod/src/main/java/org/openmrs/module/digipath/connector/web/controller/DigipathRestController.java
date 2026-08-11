@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.context.UserContext;
 import org.openmrs.module.digipath.connector.api.DigipathRestService;
 import org.openmrs.module.digipath.connector.proforma.DigipathConnector;
 import org.openmrs.module.digipath.connector.proforma.DpAlerts;
@@ -53,6 +54,9 @@ public class DigipathRestController extends MainResourceController {
 		User authenticatedUser = Context.getAuthenticatedUser();
 		DigipathRestService digipathRestService = Context.getService(DigipathRestService.class);
 		ExecutorService executor = Executors.newFixedThreadPool(5);
+
+		UserContext authContext = Context.getUserContext();
+
 		try {
 
 			List<DigipathConnector> digipathConnectorList = digipathRestService.getAllDigipathConnectorData();
@@ -61,8 +65,7 @@ public class DigipathRestController extends MainResourceController {
 
 						try {
 							Context.openSession();
-							Context.authenticate("admin", "Admin123");
-//							String response = fetchDataFromExternalApi(digipathConnector.getUrl());
+							Context.setUserContext(authContext);
 							String response = digipathConnector.getProtocol();
 							return executeProtocol(patientUuid, response);
 						} finally {
