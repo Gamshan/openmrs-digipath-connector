@@ -20,7 +20,8 @@ public class ConditionEvaluator implements DataDefinitionEvaluator {
 	ConditionService conditionService = Context.getService(ConditionService.class);
 	
 	@Override
-	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue) {
+	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue,
+	        List<Range> rangeList) {
 		
 		System.out.println(" ConditionEvaluator " + 111111);
 		List<EnactmentOptions.TimestampedValue> list;
@@ -36,6 +37,7 @@ public class ConditionEvaluator implements DataDefinitionEvaluator {
 	}
 	
 	private List<EnactmentOptions.TimestampedValue> extractAllDataForCode(Code code, Patient patient, String value) {
+		System.out.println("#### conditionList" + code);
 		Concept concept = DigipathUtils.getConceptByCode(code);
 		List<EnactmentOptions.TimestampedValue> list = new ArrayList<>();
 		List<Condition> conditionList = conditionService.getActiveConditions(patient);

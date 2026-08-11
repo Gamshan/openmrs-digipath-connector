@@ -13,27 +13,25 @@ public class DigipathUtils {
 	public static Concept getConceptByCode(Code code) {
 		ConceptService conceptService = Context.getService(ConceptService.class);
 		Concept concept = null;
-		
+
 		for (Coding coding : code.getCoding()) {
-			;
-			switch (coding.getSystem()) {
-				case "https://cielterminology.org":
-				case "https://cielterminology.org/":
-					System.out.println(" CIEL here " + coding.getCode());
-					concept = getConcept("CIEL", coding.getCode());
-					
-					break;
-				case "custom":
-					concept = conceptService.getConceptByUuid(coding.getCode());
-					break;
-				default:
-					concept = conceptService.getConceptByUuid(coding.getCode());
-					break;
+
+			if (coding.getSystem() != null) {
+				switch (coding.getSystem()) {
+					case "https://cielterminology.org":
+					case "https://cielterminology.org/":
+						concept = getConcept("CIEL", coding.getCode());
+						break;
+					default:
+						concept = conceptService.getConceptByUuid(coding.getCode());
+						break;
+				}
+			} else if (coding.getCode() != null) {
+				concept = conceptService.getConceptByUuid(coding.getCode());
 			}
-			
+
 			if (concept != null)
 				return concept;
-			
 		}
 		
 		return concept;
@@ -43,16 +41,13 @@ public class DigipathUtils {
 	public static Concept getConcept(String system, String code) {
 		
 		ConceptService conceptService = Context.getService(ConceptService.class);
-		
 		ConceptSource source = Context.getConceptService().getConceptSourceByName(system);
 		
 		ConceptReferenceTerm term = conceptService.getConceptReferenceTermByCode(code, source);
+		
 		if (term == null) {
-			System.out.println("No ConceptReferenceTerm found" + code);
 			return null;
 		}
-		
-		System.out.println("GGGG  3333333" + term + " " + term.getCode() + " " + source.getName());
 		
 		return conceptService.getConceptByMapping(term.getCode(), source.getName(), false);
 		

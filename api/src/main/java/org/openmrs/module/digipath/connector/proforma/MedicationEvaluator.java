@@ -3,6 +3,7 @@ package org.openmrs.module.digipath.connector.proforma;
 import net.openclinical.beans.Code;
 import net.openclinical.beans.DataDefinition;
 import net.openclinical.beans.Fhir;
+import net.openclinical.beans.Range;
 import net.openclinical.proforma.enactment.EnactmentOptions;
 import org.openmrs.Concept;
 import org.openmrs.Condition;
@@ -18,7 +19,8 @@ public class MedicationEvaluator implements DataDefinitionEvaluator {
 	OrderService orderService = Context.getService(OrderService.class);
 	
 	@Override
-	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue) {
+	public List<EnactmentOptions.TimestampedValue> evaluate(Fhir fhir, Patient patient, String value, boolean isMultiValue,
+	        List<Range> rangeList) {
 		
 		System.out.println(" MedicationEvaluator " + 111111 + value);
 		List<EnactmentOptions.TimestampedValue> timestampedValueList;

@@ -2,6 +2,7 @@ package org.openmrs.module.digipath.connector.api.dao;
 
 import net.openclinical.beans.DataDefinition;
 import net.openclinical.beans.Fhir;
+import net.openclinical.beans.Range;
 import net.openclinical.proforma.Protocol;
 import net.openclinical.proforma.enactment.Enactment;
 import net.openclinical.proforma.enactment.EnactmentOptions;
@@ -69,18 +70,20 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 
 			dataDefinitionList.forEach(dataDefinition -> {
 
+				System.out.println("###### " + dataDefinition.hasValueCondition());
+
 				if(dataDefinition.hasValueCondition())
 					return;
 
 				if(dataDefinition.getMeta() != null && dataDefinition.getMeta().getFhir() != null) {
-					List<EnactmentOptions.TimestampedValue> timestampedValueList = getDataByCodeAndPatient(dataDefinition.getMeta().getFhir(), patient, null, dataDefinition.isMultiValued());
+					List<EnactmentOptions.TimestampedValue> timestampedValueList = getDataByCodeAndPatient(dataDefinition.getMeta().getFhir(), patient, null, dataDefinition.isMultiValued(), dataDefinition.getRange());
 					if(timestampedValueList != null)
 						result.put(dataDefinition.getName(), timestampedValueList);
-				}else if(dataDefinition.getRange() != null){
+				} else if(dataDefinition.getRange() != null){
 					List<EnactmentOptions.TimestampedValue> valueList = new ArrayList<>();
 					dataDefinition.getRange().forEach(range -> {
 						if(range.getMeta() != null && range.getMeta().getFhir() != null) {
-							List<EnactmentOptions.TimestampedValue> timestampedValueList = getDataByCodeAndPatient(range.getMeta().getFhir(), patient, range.getValue(), range.isMultiValue() );
+							List<EnactmentOptions.TimestampedValue> timestampedValueList = getDataByCodeAndPatient(range.getMeta().getFhir(), patient, range.getValue(), range.isMultiValue(), null );
 							if(timestampedValueList != null)
 								valueList.addAll(timestampedValueList);
 						}
@@ -157,12 +160,11 @@ public class HibernateDigipathRestDao implements DigipathRestDao {
 	}
 	
 	private List<EnactmentOptions.TimestampedValue> getDataByCodeAndPatient(Fhir fhir, Patient patient, String value,
-	        boolean isMultiValue) {
-		System.out.println("isMultiValue " + isMultiValue);
+	        boolean isMultiValue, List<Range> rangeList) {
 		if (fhir.getResourceType() != null) {
 			DataDefinitionEvaluator dataDefinitionEvaluator = DataDefinitionFactory.get(fhir.getResourceType());
 			List<EnactmentOptions.TimestampedValue> timestampedValueList = dataDefinitionEvaluator.evaluate(fhir, patient,
-			    value, isMultiValue);
+			    value, isMultiValue, rangeList);
 			return timestampedValueList;
 		}
 		return null;
