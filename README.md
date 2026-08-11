@@ -10,8 +10,8 @@ The connector retrieves active clinical protocols from Open Clinical, converts O
 
 * [Overview](#overview)
 * [Architecture](#architecture)
-* [Workflow](#workflow)
 * [Data Flow](#data-flow)
+* [Workflow](#workflow)
 * [Key Features](#key-features)
 * [FHIR Resource Mapping](#fhir-resource-mapping)
 * [Configuration](#configuration)
@@ -21,7 +21,6 @@ The connector retrieves active clinical protocols from Open Clinical, converts O
 * [Database](#database)
 * [Development](#development)
 * [Contributing](#contributing)
-* [License](#license)
 
 ---
 
@@ -50,14 +49,13 @@ The system consists of the following main components:
 
 ### Component Responsibilities
 
-| Component               | Responsibility                                                                               |
-| ----------------------- | -------------------------------------------------------------------------------------------- |
-| **Open Clinical**       | Stores and manages clinical protocols                                                        |
-| **Digipaths Connector** | Integrates OpenMRS with Open Clinical, synchronises protocols, maps data, and executes rules |
-| **OpenMRS**             | Provides patient data and displays recommendations                                           |
-| **Proforma Engine**     | Evaluates patient data against clinical protocols                                            |
-| **Database**            | Stores connector configuration and downloaded protocols                                      |
-
+| Component              | Responsibility                                                                               |
+|------------------------|----------------------------------------------------------------------------------------------|
+| **Open Clinical** | Creates and manages clinical protocols used for clinical decision support. |
+| **Frontend** | Provides the patient dashboard interface for displaying Digipaths recommendations to clinicians. |
+| **Backend** | Provides the OpenMRS backend environment, loads the OpenMRS modules, and handles server-side application logic. |
+| **Digipaths Connector** | Integrates OpenMRS with Open Clinical, synchronises clinical protocols, maps patient data to FHIR resources, and executes clinical rules. |
+| **Database** | Stores OpenMRS patient and clinical data, along with connector configuration and synchronised clinical protocols. |
 ---
 
 ## Data Flow
@@ -71,7 +69,7 @@ The typical workflow for requesting clinical recommendations is:
 
 ### 1. Request Digipath Alert
 
-A user opens a patient record in OpenMRS and requests clinical recommendations.
+A clinician opens a patient record in OpenMRS and requests clinical recommendations.
 
 ### 2. Retrieve Active Protocols
 
@@ -171,7 +169,7 @@ This mapping allows the Proforma engine to evaluate clinical information using a
 
 Before using the Digipaths Connector, an administrator must configure the connection to the Open Clinical platform.
 
-## Admin UI 
+### Admin UI 
 ![Digipaths Connector Admin Config UI](docs/images/admin_config_ui.png)
 
 ---
@@ -179,17 +177,18 @@ Before using the Digipaths Connector, an administrator must configure the connec
 ### Required Configuration
 
 | Configuration                  | Description                                      |
-| ------------------------------ | ------------------------------------------------ |
+|--------------------------------|--------------------------------------------------|
 | **Open Clinical API Endpoint** | URL of the Open Clinical API                     |
 | **Username**                   | Username used to authenticate with Open Clinical |
+| **Description**                | Description of Open Clinical API for more info   |
 
 > **Note:** Additional authentication or configuration properties may be required depending on the Open Clinical deployment.
 
 ### Protocol Synchronisation
 
-After the connector has been configured, it can retrieve active protocols from Open Clinical.
+While adding the new open clinical endpoint , it can retrieve active protocol schema from Open Clinical.
 
-The downloaded protocols are stored locally in the OpenMRS database, allowing them to be used when evaluating patient data.
+The downloaded schema is stored locally in the OpenMRS database, allowing them to be used when evaluating patient data.
 
 ---
 
@@ -219,32 +218,6 @@ It provides clinicians with relevant clinical decision-support information based
 * Patient-specific recommendations
 * Clinical decision-support messages
 * Relevant rule outcomes
-
-### Example Flow
-
-```text
-Patient Record
-      │
-      ▼
-Request Recommendations
-      │
-      ▼
-Patient Data → FHIR
-      │
-      ▼
-Clinical Rules
-      │
-      ▼
-Rule Evaluation
-      │
-      ▼
-Recommendations
-      │
-      ▼
-Recommendation Panel
-```
-
----
 
 ## Main Responsibilities
 
@@ -315,7 +288,7 @@ digipaths-connector/
 
 Before developing or building the module, ensure you have:
 
-* Java Development Kit (JDK)
+* Java Development Kit (JDK) minimum 11
 * Maven
 * A running OpenMRS installation
 * Access to an Open Clinical instance
@@ -332,34 +305,6 @@ mvn clean install
 The resulting OpenMRS module (`.omod`) can then be deployed to the appropriate OpenMRS installation.
 
 > Update the build and deployment instructions here if the project uses a specific Maven profile, OpenMRS SDK command, or deployment process.
-
----
-
-## Configuration and Deployment Flow
-
-```text
-Open Clinical
-     │
-     │ API
-     ▼
-Digipaths Connector
-     │
-     ├── Synchronise Protocols
-     │
-     ├── Store Protocols
-     │
-     ├── Retrieve Patient Data
-     │
-     ├── Map Data to FHIR
-     │
-     └── Execute Proforma Rules
-              │
-              ▼
-       Recommendations
-              │
-              ▼
-       OpenMRS Dashboard
-```
 
 ---
 
