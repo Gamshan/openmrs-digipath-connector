@@ -15,7 +15,6 @@ The connector retrieves active clinical protocols from Open Clinical, converts O
 * [Key Features](#key-features)
 * [FHIR Resource Mapping](#fhir-resource-mapping)
 * [Configuration](#configuration)
-* [Main Components](#main-components)
 * [Recommendation Screen](#recommendation-screen)
 * [Technology Stack](#technology-stack)
 * [Database](#database)
