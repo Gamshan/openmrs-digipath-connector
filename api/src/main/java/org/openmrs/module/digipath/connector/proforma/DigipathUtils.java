@@ -13,9 +13,9 @@ public class DigipathUtils {
 	public static Concept getConceptByCode(Code code) {
 		ConceptService conceptService = Context.getService(ConceptService.class);
 		Concept concept = null;
-
+		
 		for (Coding coding : code.getCoding()) {
-
+			
 			if (coding.getSystem() != null) {
 				switch (coding.getSystem()) {
 					case "https://cielterminology.org":
@@ -29,7 +29,7 @@ public class DigipathUtils {
 			} else if (coding.getCode() != null) {
 				concept = conceptService.getConceptByUuid(coding.getCode());
 			}
-
+			
 			if (concept != null)
 				return concept;
 		}
