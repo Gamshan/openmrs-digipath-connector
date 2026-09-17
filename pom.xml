@@ -234,16 +234,16 @@
 	</properties>
 
 	<distributionManagement>
-		<snapshotRepository>
-			<id>openmrs-repo-snapshots</id>
-			<name>OpenMRS Snapshots</name>
-			<url>https://openmrs.jfrog.io/artifactory/snapshots</url>
-		</snapshotRepository>
 		<repository>
-			<id>openmrs-repo</id>
-			<name>OpenMRS Releases</name>
-			<url>https://openmrs.jfrog.io/artifactory/releases</url>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/Gamshan/openmrs-digipath-connector</url>
 		</repository>
+		<snapshotRepository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/Gamshan/openmrs-digipath-connector</url>
+		</snapshotRepository>
 	</distributionManagement>
 
 </project>
