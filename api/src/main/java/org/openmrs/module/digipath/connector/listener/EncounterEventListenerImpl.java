@@ -13,6 +13,7 @@ import org.openmrs.module.DaemonToken;
 
 import javax.jms.MapMessage;
 import javax.jms.Message;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +29,24 @@ public class EncounterEventListenerImpl implements EventListener {
 	
 	@Override
 	public void onMessage(Message message) {
+
+		List<String> avoidConditionList =  new ArrayList<>();
+		avoidConditionList.add("b118c548-0337-5df7-8fd0-5890352da9b0");
+		avoidConditionList.add("165206AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		avoidConditionList.add("165203AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		avoidConditionList.add("165204AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		avoidConditionList.add("165205AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		avoidConditionList.add("135576AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+		avoidConditionList.add("d3f316c3-7a53-447b-b741-80feeb144630");
+		avoidConditionList.add("f785a8d6-92f6-4213-a2bc-3b35f4356265");
+		avoidConditionList.add("28e1ddee-fced-48c1-8053-4ee9d5b55966");
+		avoidConditionList.add("9ac2cc06-11db-4d0d-88b1-87146f2feecf");
+		avoidConditionList.add("b942f3c0-5c08-4cdd-b8c6-9b802cfe2629");
+
+		avoidConditionList.add("cff7d75c-4279-5ca2-aff1-1b9722681a05");
+		avoidConditionList.add("158423AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+
+
 		
 		if (message instanceof MapMessage) {
 			MapMessage mapMessage = (MapMessage) message;
@@ -45,7 +64,17 @@ public class EncounterEventListenerImpl implements EventListener {
 							if (encounter != null) {
 								java.util.Set<Obs> observations = encounter.getObs();
 								for (Obs obs : observations) {
-									if (isCondition(obs.getValueCoded())) {
+
+									if(obs.getConcept() != null && obs.getConcept().getAnswers() != null){
+
+//										obs.getConcept().getAnswers().stream().forEach(ans->{
+//											System.out.println("FGHhhhhhh Workeddddd" + obs.getConcept());
+//										});
+
+									}
+
+									if (isCondition(obs.getValueCoded()) && !avoidConditionList.contains(obs.getValueCoded().getUuid())) {
+										System.out.println("SAVING " + obs.getValueCoded().getUuid());
 										saveAsActiveCondition(encounter, obs.getValueCoded());
 									}
 								}
@@ -74,7 +103,7 @@ public class EncounterEventListenerImpl implements EventListener {
 		
 		String className = concept.getConceptClass().getName();
 		
-		return "Diagnosis".equalsIgnoreCase(className) || "Finding".equalsIgnoreCase(className);
+		return "Diagnosis".equalsIgnoreCase(className); // || "Finding".equalsIgnoreCase(className); //Remove findings
 	}
 	
 	private void saveAsActiveCondition(Encounter encounter, Concept concept) {

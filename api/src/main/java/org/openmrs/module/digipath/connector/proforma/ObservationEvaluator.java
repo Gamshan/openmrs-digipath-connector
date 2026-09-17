@@ -31,7 +31,7 @@ public class ObservationEvaluator implements DataDefinitionEvaluator {
 		List<EnactmentOptions.TimestampedValue> list;
 		switch (fhir.getElement()) {
 			case "code":
-				list = extractDataByPatientAndCode(fhir.getCode(), patient, isMultiValue, rangeList);
+				list = extractDataByPatientAndCode(fhir.getCode(), patient, true, rangeList);
 				break;
 			default:
 				throw new IllegalArgumentException();
@@ -48,9 +48,9 @@ public class ObservationEvaluator implements DataDefinitionEvaluator {
 
 
 		obsList.forEach(obs -> {
-			if(obs.getValueNumeric() != null && (isMultiValue || timestampedValueList.isEmpty()))
+			if(obs.getValueNumeric() != null && (isMultiValue || timestampedValueList.isEmpty())) {
 				timestampedValueList.add(new EnactmentOptions.TimestampedValue(obs.getDateCreated().toInstant(), obs.getValueNumeric()));
-			else if(obs.getValueCoded() != null && rangeList != null && (isMultiValue || timestampedValueList.isEmpty())) {
+			}else if(obs.getValueCoded() != null && rangeList != null && (isMultiValue || timestampedValueList.isEmpty())) {
 				rangeList.forEach(range -> {
 					if(range.getMeta() != null && range.getMeta().getFhir() != null) {
 						Concept rangeConcept = DigipathUtils.getConceptByCode(range.getMeta().getFhir().getCode());
